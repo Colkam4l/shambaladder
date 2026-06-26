@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShambaLadder 🌾📈
+### Kenya AI Challenge 2025 · AgriFin Track
 
-## Getting Started
+ShambaLadder is a credit readiness scoring and intelligence platform designed for smallholder farmers and agricultural micro-lenders in East Africa. By aggregating self-reported data, regional remote-sensing records, cooperative relationships, and local savings groups, ShambaLadder computes multi-dimensional credit profiles and uses Generative AI to provide clear, actionable advice to help farmers step up their credit readiness.
 
-First, run the development server:
+---
 
+## Key Features
+
+1. **Multi-Dimensional Scoring:** Scores are calculated across 5 dimensions: Financial Behaviour, Farm Productivity, Climate Resilience, Social & Cooperative Capital, and Record Completeness.
+2. **Neo4j Peer Benchmarking:** Connects to a Neo4j Graph Database to evaluate a farmer's repayment history relative to peer cohorts in their local cooperative.
+3. **Automated Environmental Auditing:** Uses coordinates to retrieve climate indicators from **Open-Meteo** and soil index scores from **SoilGrids** to validate farm quality.
+4. **Featherless LLM Explanations:** Employs Mistral-7B models to translate raw numeric scores into plain-language strengths, gaps, and prioritized action lists.
+5. **Lender Weight Configuration:** Allows lenders to adjust scoring weights (0-50% per slider) with live client-side recalculations.
+6. **Secure Snapshot Sharing:** Generates secure shareable URLs and QR codes containing immutable credit score snapshots.
+
+---
+
+## Architecture & Technology Stack
+
+* **Frontend & Backend:** Next.js 16 (App Router, strict TypeScript)
+* **Styling:** Vanilla CSS & Tailwind CSS v4 (supporting responsive, print-to-PDF, and dark/light modes)
+* **Database:** Neo4j Aura DB (Graph database for peer and cooperative relationships)
+* **Inference Engine:** Featherless API (Mistral-7B-Instruct-v0.2)
+* **APIs Used:** Open-Meteo REST API, SoilGrids REST API
+
+---
+
+## Environment Setup
+
+### 1. Installation
+Clone the repository and install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Colkam4l/shambaladder.git
+cd shambaladder
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Variables Configuration
+Copy the template file to `.env.local`:
+```bash
+cp .env.local.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open `.env.local` and fill in the parameters:
+* **Neo4j Aura:** Sign up at [console.neo4j.io](https://console.neo4j.io), spin up a free DB instance, and insert your connection URL, username (`neo4j`), and generated password.
+* **Featherless LLM:** Register at [featherless.ai](https://featherless.ai), generate an API Key, and insert it.
+* **App URL:** Default is `http://localhost:3000` for local dev.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Seed the Graph Database
+Run the seed script to populate the Neo4j instance with **50 synthetic cooperative profiles** to power the peer benchmark queries:
+```bash
+npx tsx scripts/seed-neo4j.ts
+```
 
-## Learn More
+### 4. Run Locally
+Start the development server:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Judges' Walkthrough Script 🚀
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Follow these steps to experience the complete end-to-end ShambaLadder prototype flow:
 
-## Deploy on Vercel
+### Step 1: Meet the Farmers (Landing Page)
+* Navigate to `http://localhost:3000` (which automatically redirects to `/demo`).
+* You are welcomed by three pre-computed farmer profiles:
+  * **Wanjiku Kamau** (Maize, 2.5 acres, Growing Tier)
+  * **Joseph Omondi** (Maize, 3.0 acres, Trusted Tier)
+  * **Amina Hassan** (Beans, 1.5 acres, Seedling Tier)
+* These cards pull real scores dynamically from the backend.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Step 2: Interactive Scorecard Dashboard
+* Click **View profile** on **Wanjiku Kamau**.
+* Under **Farmer View**, read the plain-language explanation generated by the LLM, showing her strengths, missing indicators, and key gaps.
+* Scroll to the bottom and click **See my action plan** to view her custom recommendations sorted by estimated credit score impact. Check off items to see her projected score and tier update dynamically.
+* Return to the dashboard and toggle to **Lender View** at the top. Notice the interface changes to show an institutional audit view with verification badges (Verified, Self-Reported, Third-Party) and the Neo4j-powered cooperative peer context showing local repayment rates.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Step 3: Dynamic Weight Configuration
+* On the Lender View, click **[Configure weights →]**.
+* Move the sliders around. ShambaLadder runs a pure scoring compilation client-side in real-time, allowing you to instantly preview the score and tier changes.
+* Ensure the running total sums to exactly 100% and click **Apply and view scorecard**. The dashboard updates immediately using your custom weights in the URL query string.
+* Click **Download Profile** to trigger the browser's print menu, displaying a print-optimized, PDF-ready scorecard.
+
+### Step 4: Share Flow
+* In the dashboard, click **Share with a lender**.
+* Review the sharing consent parameters, enter a lender's name (e.g. `Kisii SACCO`), and click **Generate share link**.
+* Copy the generated link (e.g., `localhost:3000/lender/scorecard/[shareId]`) or inspect the generated QR code. Open the link in a new tab to see the restricted, read-only lender view scorecard.
+
+### Step 5: Simulate Farm Onboarding
+* Go back to `http://localhost:3000` and click the **simulate onboarding your own farm data** link at the bottom.
+* Walk through Steps 1 to 5, filling out farm size, crop choice, mobile money transaction history, yield reports, and agronomic/climate-hedging practices.
+* On Step 5, agree to all consent statements and click **Generate my score**.
+* The backend will fetch satellite and soil indices, run Neo4j graph comparisons, calculate the score, call the LLM, and redirect you to your custom farmer dashboard.
