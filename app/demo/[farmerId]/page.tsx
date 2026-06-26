@@ -53,6 +53,25 @@ export default function DemoFarmerHub({ params }: PageProps) {
     async function loadData() {
       try {
         setLoading(true);
+
+        // Check if it's a custom/onboarded profile stored in localStorage
+        const localFarmerId = localStorage.getItem('activeFarmerId');
+        if (localFarmerId === farmerId && !farmerId.startsWith('demo-')) {
+          const localProfileJson = localStorage.getItem('activeProfile');
+          const localScoreJson = localStorage.getItem('activeScore');
+          const localExplanationJson = localStorage.getItem('activeExplanation');
+          const localPeerBenchmarkJson = localStorage.getItem('activePeerBenchmark');
+
+          if (localProfileJson && localScoreJson && localExplanationJson) {
+            setProfile(JSON.parse(localProfileJson));
+            setScore(JSON.parse(localScoreJson));
+            setExplanation(JSON.parse(localExplanationJson));
+            setPeerBenchmark(localPeerBenchmarkJson ? JSON.parse(localPeerBenchmarkJson) : null);
+            setLoading(false);
+            return;
+          }
+        }
+
         const res = await fetch(`/api/demo/score/${farmerId}`);
         if (!res.ok) {
           throw new Error('Failed to fetch demo scorecard data.');
@@ -69,9 +88,10 @@ export default function DemoFarmerHub({ params }: PageProps) {
         localStorage.setItem('activeScore', JSON.stringify(data.score));
         localStorage.setItem('activeExplanation', JSON.stringify(data.explanation));
         localStorage.setItem('activePeerBenchmark', JSON.stringify(data.peerBenchmark));
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        setError(err.message || 'An error occurred while loading farmer data.');
+        const errMsg = err instanceof Error ? err.message : 'An error occurred while loading farmer data.';
+        setError(errMsg);
       } finally {
         setLoading(false);
       }

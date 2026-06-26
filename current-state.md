@@ -8,7 +8,7 @@
 ---
 
 ## Last Updated
-Sprint: 5 — Lender View UI
+Sprint: 6 — Onboarding + Demo Mode
 Date: 2026-06-26
 
 ---
@@ -38,7 +38,7 @@ Date: 2026-06-26
 | Share Profile UI | ✅ Built | Consent checklists and share URL generation |
 | Lender Scorecard UI | ✅ Built | Disclaimer warning, accordion breakdowns, and climate metrics |
 | Demo Mode | ✅ Built | Demo landing page with pre-computed cards at /demo |
-| Onboarding Form | ❌ Not built | Sprint 6 |
+| Onboarding Form | ✅ Built | Steps 1-5 multi-step form, dynamic APIs connection, client persistence |
 
 ---
 
@@ -65,12 +65,9 @@ All configured in `.env.local` (not committed):
 
 ---
 
-## What Sprint 4 Should Start With
-1. Review `docs/stitch-import.md` and `docs/design-system.md`
-2. Create Google Stitch UI component imports in `components/ui/`
-3. Implement core CSS variables/tokens in `app/globals.css` (or `index.css` system)
-4. Implement Farmer Dashboard (`/dashboard`) showing composite score, tier, and per-dimension scores
-5. Implement Action List (`/actions`) showing the ranked LLM actions
-6. Implement Score Detail page (`/score/[dimension]`)
-7. Implement Share Profile Flow (`/share`) returning share token
-8. Update this file to reflect the completed state
+## What Sprint 7 Should Start With
+1. End-to-end flow test: onboarding → score → explain → share → lender view
+2. Mobile responsiveness checks (360px viewport)
+3. Polish loading states and error screens for API/LLM timeouts
+4. Final documentation and README updates for judges
+
