@@ -8,7 +8,7 @@
 ---
 
 ## Last Updated
-Sprint: 4 — Farmer View UI
+Sprint: 5 — Lender View UI
 Date: 2026-06-26
 
 ---

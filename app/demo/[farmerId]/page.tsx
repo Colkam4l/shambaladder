@@ -3,8 +3,9 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FarmerProfile, CompositeScore, ExplanationResponse, PeerBenchmarkResult } from '@/types';
+import { calculateComposite } from '../../../lib/scoring';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { VerificationBadge } from '@/components/ui/VerificationBadge';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -32,6 +33,21 @@ export default function DemoFarmerHub({ params }: PageProps) {
 
   // Accordion state for lender view table
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+
+  // Read search params for custom weights
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get('view');
+  const w_fin = searchParams.get('w_fin');
+  const w_prod = searchParams.get('w_prod');
+  const w_clim = searchParams.get('w_clim');
+  const w_soc = searchParams.get('w_soc');
+  const w_comp = searchParams.get('w_comp');
+
+  useEffect(() => {
+    if (viewParam === 'lender' || w_fin) {
+      setActiveTab('lender');
+    }
+  }, [viewParam, w_fin]);
 
   useEffect(() => {
     async function loadData() {
@@ -117,6 +133,33 @@ export default function DemoFarmerHub({ params }: PageProps) {
     );
   }
 
+
+  let finalScore = score;
+  let isCustomWeights = false;
+
+  if (w_fin && w_prod && w_clim && w_soc && w_comp) {
+    const finVal = Number(w_fin);
+    const prodVal = Number(w_prod);
+    const climVal = Number(w_clim);
+    const socVal = Number(w_soc);
+    const compVal = Number(w_comp);
+
+    if (Math.abs((finVal + prodVal + climVal + socVal + compVal) - 100) < 0.1) {
+      isCustomWeights = true;
+      try {
+        finalScore = calculateComposite(profile, {
+          financial_behaviour: finVal / 100,
+          farm_productivity: prodVal / 100,
+          climate_resilience: climVal / 100,
+          social_coop_capital: socVal / 100,
+          record_completeness: compVal / 100,
+        });
+      } catch (err) {
+        console.error('Error recalculating client-side score in demo page:', err);
+      }
+    }
+  }
+
   return (
     <div className="min-h-screen bg-bg-page text-text-primary font-sans flex flex-col">
       {/* Lender Disclaimer (Only visible when Lender View is active) */}
@@ -172,11 +215,11 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   {profile.region === 'kenya' ? 'Kisii, Kenya' : profile.region === 'uganda' ? 'Mbale, Uganda' : 'Kigali, Rwanda'}
                 </span>
               </div>
-              <TierBadge tier={score.tier} size="md" />
+              <TierBadge tier={finalScore.tier} size="md" />
             </div>
 
             {/* Score Hero Section */}
-            <ScoreHero score={score.totalScore} tier={score.tier} />
+            <ScoreHero score={finalScore.totalScore} tier={finalScore.tier} />
 
             {/* AI Explanation Banner */}
             <AIExplanationBanner explanation={explanation?.compositeExplanation} />
@@ -190,46 +233,46 @@ export default function DemoFarmerHub({ params }: PageProps) {
               <DimensionCard
                 dimension="financial_behaviour"
                 label="Financial Behaviour"
-                weight={score.weights.financial_behaviour}
-                rawScore={score.dimensions.financial_behaviour.rawScore}
+                weight={finalScore.weights.financial_behaviour}
+                rawScore={finalScore.dimensions.financial_behaviour.rawScore}
                 explanation={explanation?.dimensions.financial_behaviour.explanation}
-                verificationFlags={score.dimensions.financial_behaviour.verificationFlags}
+                verificationFlags={finalScore.dimensions.financial_behaviour.verificationFlags}
               />
 
               <DimensionCard
                 dimension="farm_productivity"
                 label="Farm Productivity"
-                weight={score.weights.farm_productivity}
-                rawScore={score.dimensions.farm_productivity.rawScore}
+                weight={finalScore.weights.farm_productivity}
+                rawScore={finalScore.dimensions.farm_productivity.rawScore}
                 explanation={explanation?.dimensions.farm_productivity.explanation}
-                verificationFlags={score.dimensions.farm_productivity.verificationFlags}
+                verificationFlags={finalScore.dimensions.farm_productivity.verificationFlags}
               />
 
               <DimensionCard
                 dimension="climate_resilience"
                 label="Climate Resilience"
-                weight={score.weights.climate_resilience}
-                rawScore={score.dimensions.climate_resilience.rawScore}
+                weight={finalScore.weights.climate_resilience}
+                rawScore={finalScore.dimensions.climate_resilience.rawScore}
                 explanation={explanation?.dimensions.climate_resilience.explanation}
-                verificationFlags={score.dimensions.climate_resilience.verificationFlags}
+                verificationFlags={finalScore.dimensions.climate_resilience.verificationFlags}
               />
 
               <DimensionCard
                 dimension="social_coop_capital"
                 label="Social & Cooperative Capital"
-                weight={score.weights.social_coop_capital}
-                rawScore={score.dimensions.social_coop_capital.rawScore}
+                weight={finalScore.weights.social_coop_capital}
+                rawScore={finalScore.dimensions.social_coop_capital.rawScore}
                 explanation={explanation?.dimensions.social_coop_capital.explanation}
-                verificationFlags={score.dimensions.social_coop_capital.verificationFlags}
+                verificationFlags={finalScore.dimensions.social_coop_capital.verificationFlags}
               />
 
               <DimensionCard
                 dimension="record_completeness"
                 label="Record Completeness"
-                weight={score.weights.record_completeness}
-                rawScore={score.dimensions.record_completeness.rawScore}
+                weight={finalScore.weights.record_completeness}
+                rawScore={finalScore.dimensions.record_completeness.rawScore}
                 explanation={explanation?.dimensions.record_completeness.explanation}
-                verificationFlags={score.dimensions.record_completeness.verificationFlags}
+                verificationFlags={finalScore.dimensions.record_completeness.verificationFlags}
               />
             </div>
 
@@ -273,7 +316,7 @@ export default function DemoFarmerHub({ params }: PageProps) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <TierBadge tier={score.tier} size="md" />
+                <TierBadge tier={finalScore.tier} size="md" />
                 <button
                   onClick={() => window.print()}
                   className="px-3.5 py-1.5 border border-border-strong text-text-primary hover:bg-bg-inset font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center gap-1 select-none"
@@ -291,19 +334,37 @@ export default function DemoFarmerHub({ params }: PageProps) {
                 </h3>
                 <div className="flex items-baseline justify-center md:justify-start gap-1">
                   <span className="text-5xl font-black text-text-primary tracking-tight">
-                    {score.totalScore.toFixed(1)}
+                    {finalScore.totalScore.toFixed(1)}
                   </span>
                   <span className="text-sm font-bold text-text-tertiary">/100</span>
                 </div>
-                <div className="text-xs font-semibold text-text-secondary">
-                  Calculated with default weights.
+                <div className="text-xs font-semibold text-text-secondary flex flex-wrap gap-2 items-center justify-center md:justify-start">
+                  <span>Score calculated with {isCustomWeights ? 'custom' : 'default'} weights.</span>
+                  <Link
+                    href={
+                      isCustomWeights
+                        ? `/lender/configure?farmerId=${profile.farmerId}&w_fin=${w_fin}&w_prod=${w_prod}&w_clim=${w_clim}&w_soc=${w_soc}&w_comp=${w_comp}`
+                        : `/lender/configure?farmerId=${profile.farmerId}`
+                    }
+                    className="text-accent hover:underline font-bold"
+                  >
+                    [Configure weights →]
+                  </Link>
+                  {isCustomWeights && (
+                    <Link
+                      href={`/demo/${profile.farmerId}?view=lender`}
+                      className="text-text-tertiary hover:text-text-secondary underline"
+                    >
+                      Reset
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col items-center gap-1 border-t md:border-t-0 md:border-l border-border-default/60 pt-4 md:pt-0 md:pl-6">
                 <span className="text-xs font-bold uppercase tracking-wider text-text-tertiary">
                   Assessed Tier
                 </span>
-                <TierBadge tier={score.tier} size="lg" />
+                <TierBadge tier={finalScore.tier} size="lg" />
               </div>
             </div>
 
@@ -331,8 +392,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   >
                     <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-bold text-text-primary col-span-1.5">Financial Behaviour</span>
-                      <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.financial_behaviour.rawScore.toFixed(0)}/100</span>
-                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 30%</span>
+                      <span className="text-sm font-semibold text-text-secondary text-right">{finalScore.dimensions.financial_behaviour.rawScore.toFixed(0)}/100</span>
+                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(finalScore.weights.financial_behaviour * 100).toFixed(0)}%</span>
                     </div>
                     <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'financial' ? '▲' : '▼'}</span>
                   </button>
@@ -373,8 +434,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   >
                     <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-bold text-text-primary col-span-1.5">Farm Productivity</span>
-                      <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.farm_productivity.rawScore.toFixed(0)}/100</span>
-                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 25%</span>
+                      <span className="text-sm font-semibold text-text-secondary text-right">{finalScore.dimensions.farm_productivity.rawScore.toFixed(0)}/100</span>
+                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(finalScore.weights.farm_productivity * 100).toFixed(0)}%</span>
                     </div>
                     <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'productivity' ? '▲' : '▼'}</span>
                   </button>
@@ -415,8 +476,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   >
                     <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-bold text-text-primary col-span-1.5">Climate Resilience</span>
-                      <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
-                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 20%</span>
+                      <span className="text-sm font-semibold text-text-secondary text-right">{finalScore.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
+                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(finalScore.weights.climate_resilience * 100).toFixed(0)}%</span>
                     </div>
                     <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'climate' ? '▲' : '▼'}</span>
                   </button>
@@ -454,8 +515,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   >
                     <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-bold text-text-primary col-span-1.5">Social & Cooperative Capital</span>
-                      <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.social_coop_capital.rawScore.toFixed(0)}/100</span>
-                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 15%</span>
+                      <span className="text-sm font-semibold text-text-secondary text-right">{finalScore.dimensions.social_coop_capital.rawScore.toFixed(0)}/100</span>
+                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(finalScore.weights.social_coop_capital * 100).toFixed(0)}%</span>
                     </div>
                     <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'social' ? '▲' : '▼'}</span>
                   </button>
@@ -489,8 +550,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
                   >
                     <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                       <span className="text-sm font-bold text-text-primary col-span-1.5">Record Completeness</span>
-                      <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.record_completeness.rawScore.toFixed(0)}/100</span>
-                      <span className="text-[11px] font-bold text-text-tertiary text-right">multiplier</span>
+                      <span className="text-sm font-semibold text-text-secondary text-right">{finalScore.dimensions.record_completeness.rawScore.toFixed(0)}/100</span>
+                      <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(finalScore.weights.record_completeness * 100).toFixed(0)}%</span>
                     </div>
                     <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'completeness' ? '▲' : '▼'}</span>
                   </button>
@@ -537,8 +598,8 @@ export default function DemoFarmerHub({ params }: PageProps) {
               </div>
               <div className="border-t border-border-default/45 pt-3 mt-1 flex flex-col gap-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-text-secondary font-medium">Farmer's Adaptive Practices Score:</span>
-                  <span className="font-bold text-text-primary">{score.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
+                  <span className="text-text-secondary font-medium">Farmer&apos;s Adaptive Practices Score:</span>
+                  <span className="font-bold text-text-primary">{finalScore.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
                 </div>
                 <p className="text-[11px] text-text-tertiary mt-1 italic">
                   Note: A high-risk zone farmer who adopts resilient practices scores higher than a low-risk zone farmer who does not.

@@ -179,3 +179,35 @@ body {
   color: var(--color-text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  /* Hide interactive controls, links, and buttons in PDF */
+  button,
+  a,
+  .no-print,
+  input[type="checkbox"],
+  .flex.bg-bg-inset.p-1 {
+    display: none !important;
+  }
+
+  /* Expand the scorecard container to full page width */
+  .max-w-\[680px\] {
+    max-width: 100% !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Prevent page breaks inside cards */
+  .bg-bg-card,
+  .bg-accent-subtle {
+    page-break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #d1d5db !important;
+  }
+}

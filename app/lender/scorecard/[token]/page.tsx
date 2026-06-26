@@ -2,7 +2,10 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { SharedProfile } from '@/types';
+import { calculateComposite } from '../../../../lib/scoring';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { VerificationBadge } from '@/components/ui/VerificationBadge';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -22,6 +25,14 @@ export default function LenderScorecard({ params }: PageProps) {
 
   // Accordion state
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+
+  // Read search params for custom weights
+  const searchParams = useSearchParams();
+  const w_fin = searchParams.get('w_fin');
+  const w_prod = searchParams.get('w_prod');
+  const w_clim = searchParams.get('w_clim');
+  const w_soc = searchParams.get('w_soc');
+  const w_comp = searchParams.get('w_comp');
 
   useEffect(() => {
     async function loadSharedData() {
@@ -77,8 +88,35 @@ export default function LenderScorecard({ params }: PageProps) {
     );
   }
 
-  const { profileSnapshot: profile, scoreSnapshot: score, explanationSnapshot: explanation } = sharedProfile;
+  const { profileSnapshot: profile, scoreSnapshot: defaultScore, explanationSnapshot: explanation } = sharedProfile;
   const peerBenchmark = profile.social.peerBenchmark || null;
+
+
+  let score = defaultScore;
+  let isCustomWeights = false;
+
+  if (w_fin && w_prod && w_clim && w_soc && w_comp) {
+    const finVal = Number(w_fin);
+    const prodVal = Number(w_prod);
+    const climVal = Number(w_clim);
+    const socVal = Number(w_soc);
+    const compVal = Number(w_comp);
+
+    if (Math.abs((finVal + prodVal + climVal + socVal + compVal) - 100) < 0.1) {
+      isCustomWeights = true;
+      try {
+        score = calculateComposite(profile, {
+          financial_behaviour: finVal / 100,
+          farm_productivity: prodVal / 100,
+          climate_resilience: climVal / 100,
+          social_coop_capital: socVal / 100,
+          record_completeness: compVal / 100,
+        });
+      } catch (err) {
+        console.error('Error recalculating client-side score:', err);
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-bg-page text-text-primary font-sans flex flex-col">
@@ -126,8 +164,26 @@ export default function LenderScorecard({ params }: PageProps) {
               </span>
               <span className="text-sm font-bold text-text-tertiary">/100</span>
             </div>
-            <div className="text-xs font-semibold text-text-secondary">
-              Score calculated with default weights.
+            <div className="text-xs font-semibold text-text-secondary flex flex-wrap gap-2 items-center justify-center md:justify-start">
+              <span>Score calculated with {isCustomWeights ? 'custom' : 'default'} weights.</span>
+              <Link
+                href={
+                  isCustomWeights
+                    ? `/lender/configure?token=${token}&w_fin=${w_fin}&w_prod=${w_prod}&w_clim=${w_clim}&w_soc=${w_soc}&w_comp=${w_comp}`
+                    : `/lender/configure?token=${token}`
+                }
+                className="text-accent hover:underline font-bold"
+              >
+                [Configure weights →]
+              </Link>
+              {isCustomWeights && (
+                <Link
+                  href={`/lender/scorecard/${token}`}
+                  className="text-text-tertiary hover:text-text-secondary underline"
+                >
+                  Reset
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex flex-col items-center gap-1 border-t md:border-t-0 md:border-l border-border-default/60 pt-4 md:pt-0 md:pl-6">
@@ -154,7 +210,7 @@ export default function LenderScorecard({ params }: PageProps) {
           </div>
 
           <div className="divide-y divide-border-default">
-            {/* Financial Behaviour */}
+            {/* 1. Financial Behaviour */}
             <div>
               <button
                 onClick={() => toggleRow('financial')}
@@ -163,7 +219,7 @@ export default function LenderScorecard({ params }: PageProps) {
                 <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                   <span className="text-sm font-bold text-text-primary">Financial Behaviour</span>
                   <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.financial_behaviour.rawScore.toFixed(0)}/100</span>
-                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 30%</span>
+                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(score.weights.financial_behaviour * 100).toFixed(0)}%</span>
                 </div>
                 <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'financial' ? '▲' : '▼'}</span>
               </button>
@@ -196,7 +252,7 @@ export default function LenderScorecard({ params }: PageProps) {
               )}
             </div>
 
-            {/* Farm Productivity */}
+            {/* 2. Farm Productivity */}
             <div>
               <button
                 onClick={() => toggleRow('productivity')}
@@ -205,7 +261,7 @@ export default function LenderScorecard({ params }: PageProps) {
                 <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                   <span className="text-sm font-bold text-text-primary">Farm Productivity</span>
                   <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.farm_productivity.rawScore.toFixed(0)}/100</span>
-                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 25%</span>
+                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(score.weights.farm_productivity * 100).toFixed(0)}%</span>
                 </div>
                 <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'productivity' ? '▲' : '▼'}</span>
               </button>
@@ -238,7 +294,7 @@ export default function LenderScorecard({ params }: PageProps) {
               )}
             </div>
 
-            {/* Climate Resilience */}
+            {/* 3. Climate Resilience */}
             <div>
               <button
                 onClick={() => toggleRow('climate')}
@@ -247,7 +303,7 @@ export default function LenderScorecard({ params }: PageProps) {
                 <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                   <span className="text-sm font-bold text-text-primary">Climate Resilience</span>
                   <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
-                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 20%</span>
+                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(score.weights.climate_resilience * 100).toFixed(0)}%</span>
                 </div>
                 <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'climate' ? '▲' : '▼'}</span>
               </button>
@@ -277,7 +333,7 @@ export default function LenderScorecard({ params }: PageProps) {
               )}
             </div>
 
-            {/* Social & Cooperative Capital */}
+            {/* 4. Social & Cooperative Capital */}
             <div>
               <button
                 onClick={() => toggleRow('social')}
@@ -286,7 +342,7 @@ export default function LenderScorecard({ params }: PageProps) {
                 <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                   <span className="text-sm font-bold text-text-primary">Social & Cooperative Capital</span>
                   <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.social_coop_capital.rawScore.toFixed(0)}/100</span>
-                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: 15%</span>
+                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(score.weights.social_coop_capital * 100).toFixed(0)}%</span>
                 </div>
                 <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'social' ? '▲' : '▼'}</span>
               </button>
@@ -312,7 +368,7 @@ export default function LenderScorecard({ params }: PageProps) {
               )}
             </div>
 
-            {/* Record Completeness */}
+            {/* 5. Record Completeness */}
             <div>
               <button
                 onClick={() => toggleRow('completeness')}
@@ -321,7 +377,7 @@ export default function LenderScorecard({ params }: PageProps) {
                 <div className="flex-1 grid grid-cols-3 gap-2 items-center">
                   <span className="text-sm font-bold text-text-primary">Record Completeness</span>
                   <span className="text-sm font-semibold text-text-secondary text-right">{score.dimensions.record_completeness.rawScore.toFixed(0)}/100</span>
-                  <span className="text-[11px] font-bold text-text-tertiary text-right">multiplier</span>
+                  <span className="text-[11px] font-bold text-text-tertiary text-right">wt: {(score.weights.record_completeness * 100).toFixed(0)}%</span>
                 </div>
                 <span className="text-text-tertiary text-xs ml-3">{expandedRow === 'completeness' ? '▲' : '▼'}</span>
               </button>
@@ -367,7 +423,7 @@ export default function LenderScorecard({ params }: PageProps) {
           </div>
           <div className="border-t border-border-default/45 pt-3 mt-1 flex flex-col gap-1 text-xs">
             <div className="flex justify-between">
-              <span className="text-text-secondary font-medium">Farmer's Adaptive Practices Score:</span>
+              <span className="text-text-secondary font-medium">Farmer&apos;s Adaptive Practices Score:</span>
               <span className="font-bold text-text-primary">{score.dimensions.climate_resilience.rawScore.toFixed(0)}/100</span>
             </div>
             <p className="text-[11px] text-text-tertiary mt-1 italic">
