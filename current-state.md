@@ -8,7 +8,7 @@
 ---
 
 ## Last Updated
-Sprint: 2 — Neo4j + External APIs
+Sprint: 3 — LLM Explanation Engine
 Date: 2025-06-26
 
 ---
@@ -30,9 +30,9 @@ Date: 2025-06-26
 | SoilGrids client | ✅ Built | `lib/soilgrids/client.ts` soil quality index derivation |
 | /api/climate | ✅ Built | GET /api/climate with caching and demo coordination pre-population |
 | /api/soil | ✅ Built | GET /api/soil with caching and demo coordination pre-population |
-| Featherless client | ❌ Not built | Sprint 3 |
-| LLM templates | ❌ Not built | Sprint 3 |
-| /api/explain | ❌ Not built | Sprint 3 |
+| Featherless client | ✅ Built | `lib/featherless/client.ts` wrapper |
+| LLM templates | ✅ Built | `lib/featherless/templates.ts` prompt definitions |
+| /api/explain | ✅ Built | POST /api/explain with parallel generation and parsing |
 | Farmer Dashboard UI | ❌ Not built | Sprint 4 |
 | Action List UI | ❌ Not built | Sprint 4 |
 | Share Profile UI | ❌ Not built | Sprint 4 |
@@ -65,10 +65,12 @@ All configured in `.env.local` (not committed):
 
 ---
 
-## What Sprint 3 Should Start With
-1. Verify the Featherless API credentials in `.env.local`
-2. Create Featherless API client (`lib/featherless/client.ts`)
-3. Create LLM prompt templates for each score dimension and summary in `lib/featherless/templates.ts`
-4. Implement output JSON parser with retry handling in `lib/featherless/parser.ts`
-5. Create POST `/api/explain` API route (`app/api/explain/route.ts`)
-6. Update this file to reflect the completed state
+## What Sprint 4 Should Start With
+1. Review `docs/stitch-import.md` and `docs/design-system.md`
+2. Create Google Stitch UI component imports in `components/ui/`
+3. Implement core CSS variables/tokens in `app/globals.css` (or `index.css` system)
+4. Implement Farmer Dashboard (`/dashboard`) showing composite score, tier, and per-dimension scores
+5. Implement Action List (`/actions`) showing the ranked LLM actions
+6. Implement Score Detail page (`/score/[dimension]`)
+7. Implement Share Profile Flow (`/share`) returning share token
+8. Update this file to reflect the completed state
