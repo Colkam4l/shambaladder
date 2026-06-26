@@ -1,0 +1,78 @@
+{
+  "farmerId": "demo-wanjiku-001",
+  "name": "Wanjiku Kamau",
+  "location": { "latitude": -0.6698, "longitude": 37.2655 },
+  "region": "kenya",
+  "primaryCrop": "maize",
+  "farmSizeAcres": 2.5,
+  "currentSeason": "Long Rains 2025",
+  "financial": {
+    "mobileMoneyRegularity": "monthly",
+    "mobileMoneyMonthlyVolume": 4500,
+    "savingsGroupMember": true,
+    "savingsGroupContributionRegularity": "regular",
+    "priorInputCreditCycles": 0,
+    "priorRepaymentOutcomes": [],
+    "verificationStatus": {
+      "mobileMoneyRegularity": "self_reported",
+      "savingsGroupMember": "self_reported",
+      "priorRepaymentOutcomes": "missing"
+    }
+  },
+  "productivity": {
+    "yieldLastSeason": 680,
+    "yieldPreviousSeason": 620,
+    "cropDiversity": 2,
+    "usesImprovedSeeds": true,
+    "usesFertilizer": true,
+    "usesAgrochemicals": false,
+    "gpsConfirmed": false,
+    "farmBoundaryCoordinates": null,
+    "soilQualityIndex": 72,
+    "soilDataSource": "soilgrids",
+    "verificationStatus": {
+      "yieldLastSeason": "self_reported",
+      "gpsConfirmed": "missing",
+      "soilQualityIndex": "third_party"
+    }
+  },
+  "climate": {
+    "rainfallIndexLastSeason": 820,
+    "droughtIndexLastSeason": -0.3,
+    "climateRiskLevel": "low",
+    "hasIrrigationAccess": false,
+    "usesDroughtTolerantVarieties": true,
+    "practisesSoilConservation": true,
+    "hasPostHarvestStorage": false,
+    "hasCropInsurance": false,
+    "verificationStatus": {
+      "rainfallIndexLastSeason": "third_party",
+      "adaptivePractices": "self_reported"
+    }
+  },
+  "social": {
+    "cooperativeId": "coop-kisii-001",
+    "cooperativeName": "Kisii Maize Cooperative",
+    "cooperativeMemberSinceSeasons": 2,
+    "hasStableOfftaker": false,
+    "offtakerSeasons": 0,
+    "peerBenchmark": null,
+    "cooperativeRepaymentRate": 0.70,
+    "verificationStatus": {
+      "cooperativeMembership": "self_reported",
+      "offtakerRelationship": "missing",
+      "peerBenchmark": "graph_derived"
+    }
+  },
+  "completeness": {
+    "shamboproProfileComplete": false,
+    "gpsConfirmed": false,
+    "entryConsistencyScore": 0.85,
+    "internalConsistencyScore": 0.90,
+    "completenessPercentage": 75
+  },
+  "createdAt": "2025-04-01T08:00:00Z",
+  "lastUpdatedAt": "2025-04-01T08:00:00Z",
+  "consentGrantedAt": "2025-04-01T08:00:00Z",
+  "sharedProfiles": []
+}

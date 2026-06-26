@@ -1,0 +1,94 @@
+{
+  "farmerId": "demo-joseph-001",
+  "name": "Joseph Omondi",
+  "location": { "latitude": -0.6800, "longitude": 37.2800 },
+  "region": "kenya",
+  "primaryCrop": "maize",
+  "farmSizeAcres": 3.0,
+  "currentSeason": "Long Rains 2025",
+  "financial": {
+    "mobileMoneyRegularity": "weekly",
+    "mobileMoneyMonthlyVolume": 9500,
+    "savingsGroupMember": true,
+    "savingsGroupContributionRegularity": "regular",
+    "priorInputCreditCycles": 2,
+    "priorRepaymentOutcomes": ["on_time", "on_time"],
+    "verificationStatus": {
+      "mobileMoneyRegularity": "self_reported",
+      "savingsGroupMember": "self_reported",
+      "priorRepaymentOutcomes": "verified"
+    }
+  },
+  "productivity": {
+    "yieldLastSeason": 780,
+    "yieldPreviousSeason": 720,
+    "cropDiversity": 3,
+    "usesImprovedSeeds": true,
+    "usesFertilizer": true,
+    "usesAgrochemicals": true,
+    "gpsConfirmed": true,
+    "farmBoundaryCoordinates": [
+      { "latitude": -0.6800, "longitude": 37.2800 },
+      { "latitude": -0.6810, "longitude": 37.2810 },
+      { "latitude": -0.6820, "longitude": 37.2800 },
+      { "latitude": -0.6810, "longitude": 37.2790 }
+    ],
+    "soilQualityIndex": 78,
+    "soilDataSource": "soilgrids",
+    "verificationStatus": {
+      "yieldLastSeason": "self_reported",
+      "gpsConfirmed": "verified",
+      "soilQualityIndex": "third_party"
+    }
+  },
+  "climate": {
+    "rainfallIndexLastSeason": 850,
+    "droughtIndexLastSeason": -0.2,
+    "climateRiskLevel": "low",
+    "hasIrrigationAccess": true,
+    "usesDroughtTolerantVarieties": true,
+    "practisesSoilConservation": true,
+    "hasPostHarvestStorage": true,
+    "hasCropInsurance": false,
+    "verificationStatus": {
+      "rainfallIndexLastSeason": "third_party",
+      "adaptivePractices": "self_reported"
+    }
+  },
+  "social": {
+    "cooperativeId": "coop-kisii-001",
+    "cooperativeName": "Kisii Maize Cooperative",
+    "cooperativeMemberSinceSeasons": 4,
+    "hasStableOfftaker": true,
+    "offtakerSeasons": 3,
+    "peerBenchmark": {
+      "cooperativeId": "coop-kisii-001",
+      "cooperativeName": "Kisii Maize Cooperative",
+      "peerCount": 23,
+      "onTimeCount": 19,
+      "lateCount": 2,
+      "defaultCount": 2,
+      "avgPeerTier": 2.4,
+      "repaymentRate": 0.826,
+      "displayString": "19 of 23 similar farmers in Kisii Cooperative repaid on time",
+      "sufficientData": true
+    },
+    "cooperativeRepaymentRate": 0.70,
+    "verificationStatus": {
+      "cooperativeMembership": "verified",
+      "offtakerRelationship": "self_reported",
+      "peerBenchmark": "graph_derived"
+    }
+  },
+  "completeness": {
+    "shamboproProfileComplete": true,
+    "gpsConfirmed": true,
+    "entryConsistencyScore": 0.95,
+    "internalConsistencyScore": 0.97,
+    "completenessPercentage": 95
+  },
+  "createdAt": "2024-10-01T08:00:00Z",
+  "lastUpdatedAt": "2025-04-01T08:00:00Z",
+  "consentGrantedAt": "2024-10-01T08:00:00Z",
+  "sharedProfiles": []
+}

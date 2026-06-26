@@ -1,0 +1,78 @@
+{
+  "farmerId": "demo-amina-001",
+  "name": "Amina Hassan",
+  "location": { "latitude": -0.6550, "longitude": 37.2500 },
+  "region": "kenya",
+  "primaryCrop": "beans",
+  "farmSizeAcres": 1.5,
+  "currentSeason": "Long Rains 2025",
+  "financial": {
+    "mobileMoneyRegularity": "none",
+    "mobileMoneyMonthlyVolume": null,
+    "savingsGroupMember": false,
+    "savingsGroupContributionRegularity": null,
+    "priorInputCreditCycles": 0,
+    "priorRepaymentOutcomes": [],
+    "verificationStatus": {
+      "mobileMoneyRegularity": "self_reported",
+      "savingsGroupMember": "self_reported",
+      "priorRepaymentOutcomes": "missing"
+    }
+  },
+  "productivity": {
+    "yieldLastSeason": 280,
+    "yieldPreviousSeason": null,
+    "cropDiversity": 1,
+    "usesImprovedSeeds": false,
+    "usesFertilizer": false,
+    "usesAgrochemicals": false,
+    "gpsConfirmed": false,
+    "farmBoundaryCoordinates": null,
+    "soilQualityIndex": 60,
+    "soilDataSource": "soilgrids",
+    "verificationStatus": {
+      "yieldLastSeason": "self_reported",
+      "gpsConfirmed": "missing",
+      "soilQualityIndex": "third_party"
+    }
+  },
+  "climate": {
+    "rainfallIndexLastSeason": 780,
+    "droughtIndexLastSeason": -0.4,
+    "climateRiskLevel": "low",
+    "hasIrrigationAccess": false,
+    "usesDroughtTolerantVarieties": false,
+    "practisesSoilConservation": false,
+    "hasPostHarvestStorage": false,
+    "hasCropInsurance": false,
+    "verificationStatus": {
+      "rainfallIndexLastSeason": "third_party",
+      "adaptivePractices": "self_reported"
+    }
+  },
+  "social": {
+    "cooperativeId": null,
+    "cooperativeName": null,
+    "cooperativeMemberSinceSeasons": 0,
+    "hasStableOfftaker": false,
+    "offtakerSeasons": 0,
+    "peerBenchmark": null,
+    "cooperativeRepaymentRate": null,
+    "verificationStatus": {
+      "cooperativeMembership": "missing",
+      "offtakerRelationship": "missing",
+      "peerBenchmark": "missing"
+    }
+  },
+  "completeness": {
+    "shamboproProfileComplete": false,
+    "gpsConfirmed": false,
+    "entryConsistencyScore": 0.60,
+    "internalConsistencyScore": 0.70,
+    "completenessPercentage": 40
+  },
+  "createdAt": "2025-04-01T08:00:00Z",
+  "lastUpdatedAt": "2025-04-01T08:00:00Z",
+  "consentGrantedAt": "2025-04-01T08:00:00Z",
+  "sharedProfiles": []
+}
