@@ -273,6 +273,7 @@ export interface SharedProfile {
   expiresAt: string | null;
   scoreSnapshot: CompositeScore;
   explanationSnapshot: ExplanationResponse;
+  profileSnapshot: FarmerProfile;
 }
 
 // ---------------------------------------------------------------------------

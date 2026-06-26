@@ -8,8 +8,8 @@
 ---
 
 ## Last Updated
-Sprint: 3 — LLM Explanation Engine
-Date: 2025-06-26
+Sprint: 4 — Farmer View UI
+Date: 2026-06-26
 
 ---
 
@@ -33,11 +33,11 @@ Date: 2025-06-26
 | Featherless client | ✅ Built | `lib/featherless/client.ts` wrapper |
 | LLM templates | ✅ Built | `lib/featherless/templates.ts` prompt definitions |
 | /api/explain | ✅ Built | POST /api/explain with parallel generation and parsing |
-| Farmer Dashboard UI | ❌ Not built | Sprint 4 |
-| Action List UI | ❌ Not built | Sprint 4 |
-| Share Profile UI | ❌ Not built | Sprint 4 |
-| Lender Scorecard UI | ❌ Not built | Sprint 5 |
-| Demo Mode | ❌ Not built | Sprint 6 |
+| Farmer Dashboard UI | ✅ Built | Dashboard with large score display and dimension breakdown cards |
+| Action List UI | ✅ Built | Ranked prioritised actions with projected score calculator |
+| Share Profile UI | ✅ Built | Consent checklists and share URL generation |
+| Lender Scorecard UI | ✅ Built | Disclaimer warning, accordion breakdowns, and climate metrics |
+| Demo Mode | ✅ Built | Demo landing page with pre-computed cards at /demo |
 | Onboarding Form | ❌ Not built | Sprint 6 |
 
 ---
