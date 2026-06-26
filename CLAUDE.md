@@ -142,6 +142,7 @@ shambaladder/
 1. Ensure the build passes with zero TypeScript errors.
 2. Update `current-state.md`.
 3. Write `context/sprint_N-context.md` using the structure below.
+4. **Do NOT push to GitHub.** All git push operations must be performed manually by the user.
 
 ### What to Expect at the End of Each Sprint
 
@@ -198,6 +199,9 @@ Expected: a number between 3–6.
 
 **6. Check `current-state.md` is up to date**
 Open `current-state.md` and confirm every item built this sprint has a ✅ next to it. If anything still shows ❌ that should be done, the sprint is not complete.
+
+**7. Manual Git Push**
+Do NOT automatically push to the remote repository. Notify the user that the sprint is complete, and let them perform the git push manually.
 
 ### Sprint Context File Structure
 
@@ -320,6 +324,7 @@ interface ApiError {
 4. **Share farmer data without explicit consent action.** The sharing flow is defined in the screen spec. Do not shortcut it.
 5. **Add external dependencies without justification.** Document in `decisions.md`.
 6. **Hardcode GPS coordinates, API keys, or farmer data in application code.** Use environment variables and demo data files.
+7. **Automatically push to GitHub.** All git push actions must be handled manually by the user. Do not run `git push` under any circumstances.
 
 ---
 
