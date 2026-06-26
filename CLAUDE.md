@@ -143,6 +143,62 @@ shambaladder/
 2. Update `current-state.md`.
 3. Write `context/sprint_N-context.md` using the structure below.
 
+### What to Expect at the End of Each Sprint
+
+A quick plain-language summary of what "done" looks like per sprint so you can tell at a glance whether a sprint is complete.
+
+| Sprint | You should be able to… |
+|---|---|
+| **Sprint 1** | Call `POST /api/score` with a farmer profile and get back a score number and a tier label (Seedling / Growing / Established / Trusted). All 61 unit tests pass. |
+| **Sprint 2** | Farmer data flows from Neo4j (peer benchmark), Open-Meteo (climate), and SoilGrids (soil). Each has its own API route that returns real data. |
+| **Sprint 3** | Call `POST /api/explain` and get back plain-language sentences explaining each score dimension plus a ranked action list. No placeholder text. |
+| **Sprint 4** | Open `/demo` in a browser, pick Wanjiku, and see her score dashboard with real LLM explanations and a working "Share" button. |
+| **Sprint 5** | Open the share link as a lender and see the full scorecard with peer benchmark data and verification badges. |
+| **Sprint 6** | The full demo runs end-to-end — pick a farmer, see the score, share it, view it as a lender — with zero placeholder text. |
+| **Sprint 7** | The demo runs on a phone-sized browser window with no broken layouts, loading states on every async call, and a complete README. |
+
+### How to Test the Completed Sprint
+
+Run these commands after every sprint to confirm nothing is broken.
+
+**1. TypeScript — zero errors required**
+```bash
+npx tsc --noEmit
+```
+If this prints anything, fix it before moving on.
+
+**2. Unit tests (Sprints 1+)**
+```bash
+npm test
+```
+All tests must pass. A failing test means the scoring engine has a bug — do not skip.
+
+**3. Dev server — confirms the app actually starts**
+```bash
+npm run dev
+```
+Visit `http://localhost:3000`. If the page loads, the scaffold is healthy.
+
+**4. Smoke-test the score API (Sprints 1+)**
+```bash
+curl -s -X POST http://localhost:3000/api/score \
+  -H "Content-Type: application/json" \
+  -d @public/demo-data/wanjiku.json | jq '.score.totalScore, .score.tier'
+```
+Expected: a number between 40–59 and `"growing"`.
+
+**5. Smoke-test the explain API (Sprint 3+)**
+```bash
+# Start dev server first, then:
+curl -s -X POST http://localhost:3000/api/explain \
+  -H "Content-Type: application/json" \
+  -d '{"profile": <wanjiku JSON>, "score": <score JSON>}' | jq '.actionList | length'
+```
+Expected: a number between 3–6.
+
+**6. Check `current-state.md` is up to date**
+Open `current-state.md` and confirm every item built this sprint has a ✅ next to it. If anything still shows ❌ that should be done, the sprint is not complete.
+
 ### Sprint Context File Structure
 
 ```markdown
