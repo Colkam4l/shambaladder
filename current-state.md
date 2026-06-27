@@ -8,7 +8,7 @@
 ---
 
 ## Last Updated
-Sprint: 8 — Lender Marketplace
+Sprint: 9 — Ingestion & Graph Write
 Date: 2026-06-27
 
 ---
@@ -41,10 +41,11 @@ Date: 2026-06-27
 | Onboarding Form | ✅ Built | Steps 1-5 multi-step form, dynamic APIs connection, client persistence |
 | Lender Marketplace | ✅ Built | `/lender` — 50 farmer browseable grid, full filter sidebar, lead capture modal |
 | Farmer Registry Data | ✅ Built | `lib/farmer-registry/registry-data.ts` — 50 crop-only profiles, all tiers |
-| /api/lender/farmers | ✅ Built | GET — scores all 50 farmers, supports tier/crop/region/score/size filters |
-| FarmerMarketplaceCard | ✅ Built | Score bar, tier badge, strength/gap pills, Neo4j peer signal per card |
-| MarketplaceFilters | ✅ Built | Tier checkboxes, min-score slider, crop/region dropdowns, farm-size range |
+| /api/lender/farmers | ✅ Built | GET — fetches and scores farmers dynamically from Neo4j graph database |
+| FarmerMarketplaceCard | ✅ Built | Score bar, tier badge, strength/gap pills, Neo4j peer signal, and View Profile deep link |
+| MarketplaceFilters | ✅ Built | Tier, crop, region filters (de-vibe-coded), plus integrated name search |
 | LeadCaptureModal | ✅ Built | Institution + email form, 24h facilitation confirmation |
+| Ingestion UI & API | ✅ Built | Drag-and-drop report uploader, simulated OCR parser, and live Neo4j write transaction |
 
 ---
 

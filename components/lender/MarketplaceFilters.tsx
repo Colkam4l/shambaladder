@@ -16,33 +16,41 @@ interface MarketplaceFiltersProps {
   filters: FilterState;
   onChange: (f: FilterState) => void;
   totalResults: number;
+  searchTerm: string;
+  onSearchChange: (val: string) => void;
 }
 
 const TIER_OPTIONS = [
-  { value: 'trusted',     label: '⭐ Trusted',     desc: '80–100' },
-  { value: 'established', label: '✓ Established',  desc: '60–79'  },
-  { value: 'growing',     label: '📈 Growing',      desc: '40–59'  },
-  { value: 'seedling',    label: '🌱 Seedling',     desc: '20–39'  },
+  { value: 'trusted',     label: 'Trusted',     desc: '80–100' },
+  { value: 'established', label: 'Established',  desc: '60–79'  },
+  { value: 'growing',     label: 'Growing',      desc: '40–59'  },
+  { value: 'seedling',    label: 'Seedling',     desc: '20–39'  },
 ];
 
 const CROP_OPTIONS = [
   { value: '',        label: 'All crops'  },
-  { value: 'maize',  label: '🌽 Maize'   },
-  { value: 'beans',  label: '🫘 Beans'   },
-  { value: 'tomato', label: '🍅 Tomato'  },
-  { value: 'coffee', label: '☕ Coffee'  },
-  { value: 'tea',    label: '🍃 Tea'     },
-  { value: 'sorghum',label: '🌾 Sorghum' },
+  { value: 'maize',  label: 'Maize'   },
+  { value: 'beans',  label: 'Beans'   },
+  { value: 'tomato', label: 'Tomato'  },
+  { value: 'coffee', label: 'Coffee'  },
+  { value: 'tea',    label: 'Tea'     },
+  { value: 'sorghum',label: 'Sorghum' },
 ];
 
 const REGION_OPTIONS = [
   { value: '',        label: 'All regions' },
-  { value: 'kenya',  label: '🇰🇪 Kenya'   },
-  { value: 'uganda', label: '🇺🇬 Uganda'  },
-  { value: 'rwanda', label: '🇷🇼 Rwanda'  },
+  { value: 'kenya',  label: 'Kenya'   },
+  { value: 'uganda', label: 'Uganda'  },
+  { value: 'rwanda', label: 'Rwanda'  },
 ];
 
-export function MarketplaceFilters({ filters, onChange, totalResults }: MarketplaceFiltersProps) {
+export function MarketplaceFilters({
+  filters,
+  onChange,
+  totalResults,
+  searchTerm,
+  onSearchChange,
+}: MarketplaceFiltersProps) {
   const toggleTier = (tier: string) => {
     const next = filters.tiers.includes(tier)
       ? filters.tiers.filter(t => t !== tier)
@@ -50,8 +58,10 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
     onChange({ ...filters, tiers: next });
   };
 
-  const reset = () =>
+  const reset = () => {
     onChange({ tiers: [], minScore: 0, crop: '', region: '', minAcres: 0, maxAcres: 100 });
+    onSearchChange('');
+  };
 
   const isDirty =
     filters.tiers.length > 0 ||
@@ -59,32 +69,55 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
     filters.crop !== '' ||
     filters.region !== '' ||
     filters.minAcres > 0 ||
-    filters.maxAcres < 100;
+    filters.maxAcres < 100 ||
+    searchTerm !== '';
 
   return (
-    <aside className="w-full lg:w-72 flex-shrink-0 space-y-5">
+    <aside className="w-full lg:w-72 flex-shrink-0 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-text-primary text-sm uppercase tracking-wide">Filters</h2>
+      <div className="flex items-center justify-between border-b border-border-default/60 pb-3">
+        <h2 className="font-bold text-text-primary text-xs uppercase tracking-wider">Filters</h2>
         {isDirty && (
           <button
             onClick={reset}
-            className="text-xs text-accent-primary hover:underline font-medium transition-colors"
+            className="text-xs text-accent-primary hover:underline font-semibold transition-colors"
           >
             Reset all
           </button>
         )}
       </div>
 
+      {/* Search Bar (Oracle-standard input) */}
+      <div className="space-y-2">
+        <label className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Search Farmer</label>
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={e => onSearchChange(e.target.value)}
+            placeholder="Search by name..."
+            className="w-full bg-bg-page border border-border-default rounded-xl px-3.5 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent-primary/35 transition"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => onSearchChange('')}
+              className="absolute right-3 top-2.5 text-text-muted hover:text-text-primary text-xs"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Results count */}
       <p className="text-xs text-text-muted">
-        Showing <span className="font-bold text-text-primary">{totalResults}</span> farmers
+        Showing <span className="font-semibold text-text-primary">{totalResults}</span> matching farmers
       </p>
 
       {/* Tier filter */}
-      <div className="space-y-2">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Tier</p>
-        <div className="space-y-1.5">
+      <div className="space-y-2.5">
+        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Credit Tier</p>
+        <div className="space-y-2">
           {TIER_OPTIONS.map(t => (
             <label
               key={t.value}
@@ -105,9 +138,9 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
               </span>
               <span
                 onClick={() => toggleTier(t.value)}
-                className="flex-1 flex items-center justify-between text-sm text-text-primary cursor-pointer"
+                className="flex-1 flex items-center justify-between text-sm text-text-primary cursor-pointer select-none"
               >
-                <span>{t.label}</span>
+                <span className="font-medium">{t.label}</span>
                 <span className="text-xs text-text-muted">{t.desc}</span>
               </span>
             </label>
@@ -116,9 +149,9 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
       </div>
 
       {/* Min score slider */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Min Score</p>
+          <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Min Score</p>
           <span className="text-sm font-bold text-accent-primary">{filters.minScore}</span>
         </div>
         <input
@@ -128,7 +161,7 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
           step={5}
           value={filters.minScore}
           onChange={e => onChange({ ...filters, minScore: Number(e.target.value) })}
-          className="w-full accent-accent-primary cursor-pointer h-1.5"
+          className="w-full accent-accent-primary cursor-pointer h-1"
         />
         <div className="flex justify-between text-[10px] text-text-muted">
           <span>0</span>
@@ -138,11 +171,11 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
 
       {/* Crop filter */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Crop</p>
+        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Crop</p>
         <select
           value={filters.crop}
           onChange={e => onChange({ ...filters, crop: e.target.value })}
-          className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/40 transition cursor-pointer"
+          className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/35 transition cursor-pointer font-medium"
         >
           {CROP_OPTIONS.map(c => (
             <option key={c.value} value={c.value}>{c.label}</option>
@@ -152,11 +185,11 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
 
       {/* Region filter */}
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Region</p>
+        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Region</p>
         <select
           value={filters.region}
           onChange={e => onChange({ ...filters, region: e.target.value })}
-          className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/40 transition cursor-pointer"
+          className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/35 transition cursor-pointer font-medium"
         >
           {REGION_OPTIONS.map(r => (
             <option key={r.value} value={r.value}>{r.label}</option>
@@ -165,8 +198,8 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
       </div>
 
       {/* Farm size range */}
-      <div className="space-y-2">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wide">Farm Size (acres)</p>
+      <div className="space-y-2.5 border-t border-border-default/60 pt-4">
+        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Farm Size (acres)</p>
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -174,7 +207,7 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
             max={filters.maxAcres}
             value={filters.minAcres}
             onChange={e => onChange({ ...filters, minAcres: Number(e.target.value) })}
-            className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/40 transition"
+            className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/35 transition"
             placeholder="Min"
           />
           <span className="text-text-muted text-xs flex-shrink-0">to</span>
@@ -184,7 +217,7 @@ export function MarketplaceFilters({ filters, onChange, totalResults }: Marketpl
             max={100}
             value={filters.maxAcres}
             onChange={e => onChange({ ...filters, maxAcres: Number(e.target.value) })}
-            className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/40 transition"
+            className="w-full bg-bg-page border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/35 transition"
             placeholder="Max"
           />
         </div>

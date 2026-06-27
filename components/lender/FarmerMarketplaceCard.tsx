@@ -85,7 +85,7 @@ export function FarmerMarketplaceCard({ farmer, onRequestContact }: FarmerMarket
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-text-primary text-[15px] leading-tight truncate">{farmer.name}</p>
           <p className="text-xs text-text-muted mt-0.5 capitalize">
-            {cropEmoji} {farmer.primaryCrop} · {farmer.farmSizeAcres} acres · {farmer.region}
+            {farmer.primaryCrop} · {farmer.farmSizeAcres} acres · {farmer.region}
           </p>
         </div>
         <div className="flex-shrink-0">
