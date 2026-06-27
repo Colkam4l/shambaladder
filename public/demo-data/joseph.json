@@ -90,5 +90,6 @@
   "createdAt": "2024-10-01T08:00:00Z",
   "lastUpdatedAt": "2025-04-01T08:00:00Z",
   "consentGrantedAt": "2024-10-01T08:00:00Z",
+  "marketplaceConsent": true,
   "sharedProfiles": []
 }

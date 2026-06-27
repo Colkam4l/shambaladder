@@ -207,6 +207,7 @@ export interface FarmerProfile {
   createdAt: string;
   lastUpdatedAt: string;
   consentGrantedAt: string;
+  marketplaceConsent: boolean; // Platform-level consent: profile visible in lender marketplace
   sharedProfiles: SharedProfile[];
 }
 

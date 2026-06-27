@@ -99,7 +99,19 @@ export default function DemoLanding() {
           <p className="text-sm md:text-base text-text-secondary leading-relaxed font-medium">
             Each profile runs the live scoring engine and AI explanation system. Select a profile to view their credit readiness scorecard.
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              href="/lender"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-accent-primary/20"
+            >
+              <span>🏦</span>
+              <span>Lender Marketplace</span>
+              <span className="text-xs opacity-70">→</span>
+            </Link>
+            <span className="text-xs text-text-muted">Browse & filter 50 scored farmers</span>
+          </div>
         </section>
+
 
         {/* Error State */}
         {error && (

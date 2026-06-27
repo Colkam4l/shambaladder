@@ -8,8 +8,8 @@
 ---
 
 ## Last Updated
-Sprint: 7 — Polish + Integration
-Date: 2026-06-26
+Sprint: 8 — Lender Marketplace
+Date: 2026-06-27
 
 ---
 
@@ -39,6 +39,12 @@ Date: 2026-06-26
 | Lender Scorecard UI | ✅ Built | Disclaimer warning, accordion breakdowns, and climate metrics |
 | Demo Mode | ✅ Built | Demo landing page with pre-computed cards at /demo |
 | Onboarding Form | ✅ Built | Steps 1-5 multi-step form, dynamic APIs connection, client persistence |
+| Lender Marketplace | ✅ Built | `/lender` — 50 farmer browseable grid, full filter sidebar, lead capture modal |
+| Farmer Registry Data | ✅ Built | `lib/farmer-registry/registry-data.ts` — 50 crop-only profiles, all tiers |
+| /api/lender/farmers | ✅ Built | GET — scores all 50 farmers, supports tier/crop/region/score/size filters |
+| FarmerMarketplaceCard | ✅ Built | Score bar, tier badge, strength/gap pills, Neo4j peer signal per card |
+| MarketplaceFilters | ✅ Built | Tier checkboxes, min-score slider, crop/region dropdowns, farm-size range |
+| LeadCaptureModal | ✅ Built | Institution + email form, 24h facilitation confirmation |
 
 ---
 
@@ -61,7 +67,7 @@ All configured in `.env.local` (not committed):
 ---
 
 ## Known Issues
-- None. TypeScript compiles with zero errors. All 61 unit tests pass.
+- None. TypeScript compiles with zero errors. All 61 unit tests pass. API returns 50 farmers, filters verified.
 
 ---
 

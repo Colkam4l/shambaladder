@@ -125,8 +125,16 @@ export default function LenderScorecard({ params }: PageProps) {
 
       {/* Main Container */}
       <div className="flex-1 w-full max-w-[680px] mx-auto px-4 py-6 md:py-8 flex flex-col gap-6">
-        
-        {/* Header Block */}
+
+        {/* Back to marketplace */}
+        <Link
+          href="/lender"
+          className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent-primary transition-colors font-medium w-fit"
+        >
+          <span>←</span>
+          <span>Back to Marketplace</span>
+        </Link>
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border-default/50 pb-4">
           <div className="space-y-1">
             <h1 className="text-xl md:text-2xl font-extrabold text-text-primary">
