@@ -1,0 +1,43 @@
+Financial Report
+Bugesera Peas | Kenya
+
+Farm Profile - Crop
+Username: Jean-Claude Bugesera
+Role: Farm Owner/Organization
+Farm Enterprise: Crop
+Crop Type: Maize
+Crop Variety: H614
+Cropping System: Conventional
+Cultivation System: Open Field
+Watering Type: Rainfed
+Reporting Date: 27th March, 2025
+
+Sales/Income
+Date         Buyer          Produce     Quantity (Bags)  Unit Price (KES)   Amount (KES)
+25-Mar-2025  Nairobi Mills  Maize       45               3,200              144,000.00
+----------------------------------------------------------------------------------------
+Total Sales/Income                                                          144,000.00
+
+Farm Inputs & Services
+Date         Seller         Input/Service Quantity (Units) Unit Price (KES)   Amount (KES)
+10-Mar-2025  Kisii Agrovets Hybrid Seed   5                2,500              12,500.00
+12-Mar-2025  Kisii Agrovets DAP Fertilizer10               4,500              45,000.00
+----------------------------------------------------------------------------------------
+Total Farm Inputs                                                           57,500.00
+
+Gross Profit/Loss
+86,500.00 KES
+
+Monthly Payments & Other Expenses
+Date         Transaction    Payee          Quantity        Unit Price (KES)   Amount (KES)
+15-Mar-2025  Labor Wages    Harvest Crew   6               1,500              9,000.00
+20-Mar-2025  Transport      Kigali Trucks  1               12,000             12,000.00
+----------------------------------------------------------------------------------------
+Total Payments & Expenses                                                   21,000.00
+
+Net Profit/Loss
+65,500.00 KES
+
+----------------------------------------------------------------------------------------
+Data Ownership and Confidentiality Disclaimer
+This report contains proprietary data belonging to the farm owner. The information is confidential and intended solely for the recipient. It may not be shared, distributed, or disclosed to third parties without explicit written permission from the data owner. For inquiries or more information, please contact hello@shambapro.com or visit www.shambapro.com

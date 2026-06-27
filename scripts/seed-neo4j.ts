@@ -2,26 +2,25 @@
 // Run with: npx tsx scripts/seed-neo4j.ts
 
 import { loadEnvConfig } from '@next/env';
+import fs from 'fs';
+import path from 'path';
+
 // Load environment variables from .env.local
 loadEnvConfig(process.cwd());
 
 import { runQuery, closeDriver } from '../lib/neo4j/client';
-import { SYNTHETIC_FARMERS } from './neo4j-seed-data';
+import { saveFarmerToGraph } from '../lib/neo4j/farmers';
+import { FARMER_REGISTRY } from '../lib/farmer-registry/registry-data';
+import type { FarmerProfile } from '../types';
 
 async function seed() {
   console.log('Starting Neo4j seed process...');
 
   // 1. Clear existing database nodes and relationships
   console.log('Clearing old Farmer, Cooperative, and Region nodes...');
-  await runQuery(`
-    MATCH (f:Farmer) DETACH DELETE f
-  `, {});
-  await runQuery(`
-    MATCH (c:Cooperative) DETACH DELETE c
-  `, {});
-  await runQuery(`
-    MATCH (r:Region) DETACH DELETE r
-  `, {});
+  await runQuery('MATCH (f:Farmer) DETACH DELETE f', {});
+  await runQuery('MATCH (c:Cooperative) DETACH DELETE c', {});
+  await runQuery('MATCH (r:Region) DETACH DELETE r', {});
 
   // 2. Create Cooperative
   console.log('Creating Kisii Cooperative...');
@@ -52,74 +51,42 @@ async function seed() {
     MERGE (c)-[:LOCATED_IN]->(r)
   `, {});
 
-  // 5. Seed 50 Synthetic Farmers
-  console.log(`Seeding ${SYNTHETIC_FARMERS.length} synthetic farmers...`);
-  for (const farmer of SYNTHETIC_FARMERS) {
-    await runQuery(`
-      CREATE (f:Farmer {
-        farmerId: $farmerId,
-        name: $name,
-        primaryCrop: $primaryCrop,
-        farmSizeAcres: $farmSizeAcres,
-        currentTier: $currentTier,
-        region: $region
-      })
-    `, farmer as unknown as Record<string, unknown>);
-
-    await runQuery(`
-      MATCH (f:Farmer {farmerId: $farmerId})
-      MATCH (c:Cooperative {cooperativeId: 'coop-kisii-001'})
-      MERGE (f)-[m:MEMBER_OF]->(c)
-      SET m.tenureSeasons = $tenureSeasons,
-          m.repaymentOutcome = $repaymentOutcome
-    `, {
-      farmerId: farmer.farmerId,
-      tenureSeasons: farmer.tenureSeasons,
-      repaymentOutcome: farmer.repaymentOutcome,
-    });
+  // 5. Seed 50 Registry Farmers (fully structured)
+  console.log(`Seeding ${FARMER_REGISTRY.length} registry farmers...`);
+  for (const farmer of FARMER_REGISTRY) {
+    await saveFarmerToGraph(farmer);
   }
 
-  // 6. Merge Demo Farmers
+  // 6. Merge Demo Farmers (fully structured)
   console.log('Seeding the 3 demo farmers...');
-  
-  // Demo Farmer 1: Wanjiku Kamau
-  await runQuery(`
-    MERGE (f:Farmer {farmerId: 'demo-wanjiku-001'})
-    SET f.name = 'Wanjiku Kamau',
-        f.primaryCrop = 'maize',
-        f.farmSizeAcres = 2.5,
-        f.currentTier = 2,
-        f.region = 'kisii'
-    WITH f
-    MATCH (c:Cooperative {cooperativeId: 'coop-kisii-001'})
-    MERGE (f)-[m:MEMBER_OF]->(c)
-    SET m.tenureSeasons = 2,
-        m.repaymentOutcome = null
-  `, {});
+  const demoDir = path.join(process.cwd(), 'public', 'demo-data');
+  const demoFiles = ['wanjiku.json', 'joseph.json', 'amina.json'];
 
-  // Demo Farmer 2: Joseph Omondi
-  await runQuery(`
-    MERGE (f:Farmer {farmerId: 'demo-joseph-001'})
-    SET f.name = 'Joseph Omondi',
-        f.primaryCrop = 'maize',
-        f.farmSizeAcres = 3.0,
-        f.currentTier = 4,
-        f.region = 'kisii'
-    WITH f
-    MATCH (c:Cooperative {cooperativeId: 'coop-kisii-001'})
-    MERGE (f)-[m:MEMBER_OF]->(c)
-    SET m.tenureSeasons = 4,
-        m.repaymentOutcome = 'on_time'
-  `, {});
+  for (const file of demoFiles) {
+    const raw = fs.readFileSync(path.join(demoDir, file), 'utf-8');
+    const profile = JSON.parse(raw) as FarmerProfile;
+    await saveFarmerToGraph(profile);
+  }
 
-  // Demo Farmer 3: Amina Hassan (Beans, no cooperative membership)
+  // 7. Map repayment outcomes for peer benchmark calculations
+  console.log('Mapping relationship repayment properties for benchmark calculations...');
+  for (const farmer of FARMER_REGISTRY) {
+    if (farmer.financial.priorRepaymentOutcomes.length > 0) {
+      // Set the repayment outcome on the MEMBER_OF relationship
+      await runQuery(`
+        MATCH (f:Farmer {farmerId: $farmerId})-[m:MEMBER_OF]->(c:Cooperative)
+        SET m.repaymentOutcome = $outcome
+      `, {
+        farmerId: farmer.farmerId,
+        outcome: farmer.financial.priorRepaymentOutcomes[0] // use first repayment outcome as baseline
+      });
+    }
+  }
+
+  // Set Joseph's repayment outcome explicitly
   await runQuery(`
-    MERGE (f:Farmer {farmerId: 'demo-amina-001'})
-    SET f.name = 'Amina Hassan',
-        f.primaryCrop = 'beans',
-        f.farmSizeAcres = 1.5,
-        f.currentTier = 1,
-        f.region = 'kisii'
+    MATCH (f:Farmer {farmerId: 'demo-joseph-001'})-[m:MEMBER_OF]->(c:Cooperative)
+    SET m.repaymentOutcome = 'on_time'
   `, {});
 
   console.log('Database seeded successfully.');

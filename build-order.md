@@ -287,6 +287,38 @@ peerBenchmarkSummary (optional, lender-only)
 
 ---
 
+## Sprint 8 — Lender Marketplace
+
+**What gets built:**
+- `lib/farmer-registry/registry-data.ts` — 50 crop-only profiles spanning Seedling, Growing, Established, and Trusted tiers.
+- `/lender/marketplace` UI — filterable, browseable grid listing all 50 farmers with scores, crop types, regions, and peer counts.
+- `GET /api/lender/farmers` — API endpoint supporting query-param filters that recalculates scores live using standard weights.
+- Lead capture modal — input form collecting institution email and name, notifying that the farmer must confirm the connection.
+- Back links — navigation links from individual scorecards back to the marketplace.
+
+**Sprint complete when:**
+- [ ] Lender landing displays all 50 farmers correctly sorted.
+- [ ] Querying with filter parameters returns accurate counts (e.g. 12 farmers for trusted/established maize).
+- [ ] Lead capture modal processes simulated submission.
+
+---
+
+## Sprint 9 — PDF Ingestion + Neo4j Write
+
+**What gets built:**
+- PDF Ingest interface on Lender Marketplace page (drag & drop file input).
+- `POST /api/lender/ingest` — endpoint that parses text signatures of uploaded files to simulate extraction and return a fully populated `FarmerProfile` JSON.
+- `lib/neo4j/client.ts` write helper (`saveFarmerProfile(profile: FarmerProfile): Promise<void>`) to write the new profile as a `(:Farmer)` node and create its `[:MEMBER_OF]` relationship to `(:Cooperative)`.
+- Update `GET /api/lender/farmers` to fetch profiles directly from the Neo4j Graph database instead of static registry arrays.
+- Refresh trigger on marketplace to fetch newly added farmers after successful upload.
+
+**Sprint complete when:**
+- [ ] Uploading one of the four crop/livestock financial PDF reports creates a new `Farmer` node in Neo4j.
+- [ ] Graph count query (`MATCH (n) ...`) increases live after a PDF is uploaded.
+- [ ] Newly added farmer appears instantly in the marketplace grid with real-time scoring.
+
+---
+
 ## Post-Hackathon Roadmap (🔴 — Do Not Build Now)
 
 **Production data integrations:**

@@ -39,6 +39,12 @@ export default function LenderMarketplace() {
   const [filters, setFilters]     = useState<FilterState>(DEFAULT_FILTERS);
   const [modalFarmer, setModalFarmer] = useState<FarmerListing | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  
+  // Ingestion states
+  const [ingesting, setIngesting] = useState(false);
+  const [ingestSuccess, setIngestSuccess] = useState<string | null>(null);
+  const [ingestError, setIngestError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const buildQuery = useCallback((f: FilterState) => {
     const p = new URLSearchParams();
@@ -67,7 +73,39 @@ export default function LenderMarketplace() {
       }
     }
     load();
-  }, [filters, buildQuery]);
+  }, [filters, buildQuery, refreshTrigger]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIngesting(true);
+    setIngestSuccess(null);
+    setIngestError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/lender/ingest', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Ingestion failed');
+      }
+
+      setIngestSuccess(`Successfully ingested "${file.name}". Farmer "${data.farmer.name}" (${data.farmer.primaryCrop}) added to Neo4j!`);
+      setRefreshTrigger(prev => prev + 1); // trigger reload from graph
+    } catch (err: any) {
+      console.error(err);
+      setIngestError(err.message || 'Error uploading file.');
+    } finally {
+      setIngesting(false);
+    }
+  };
 
   const tierCounts = farmers.reduce<Record<string, number>>((acc, f) => {
     acc[f.tier] = (acc[f.tier] ?? 0) + 1;
@@ -96,21 +134,69 @@ export default function LenderMarketplace() {
       </header>
 
       {/* ── Hero ── */}
-      <div className="bg-gradient-to-b from-accent-primary/8 to-transparent border-b border-border-default/50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-10 space-y-3">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary leading-tight">
-            Farmer Credit Marketplace
-          </h1>
-          <p className="text-sm md:text-base text-text-secondary max-w-2xl leading-relaxed">
-            Browse pre-scored, cooperative-verified farmers across Kenya, Uganda, and Rwanda.
-            Every score is rules-based and auditable. Every peer signal is live from the Neo4j cooperative graph.
-          </p>
+      <div className="bg-gradient-to-b from-accent-primary/8 to-transparent border-b border-border-default/50 pb-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-4">
+          <div className="space-y-2">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary leading-tight">
+              Farmer Credit Marketplace
+            </h1>
+            <p className="text-sm md:text-base text-text-secondary max-w-2xl leading-relaxed">
+              Browse pre-scored, cooperative-verified farmers across Kenya, Uganda, and Rwanda.
+              Every score is rules-based and auditable. Every peer signal is live from the Neo4j cooperative graph.
+            </p>
+          </div>
+
+          {/* Real-time Document Ingest Section */}
+          <div className="bg-bg-card border border-border-default rounded-2xl p-4 max-w-3xl flex flex-col md:flex-row md:items-center gap-4 shadow-sm">
+            <div className="flex-1 space-y-1">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-accent-primary">Live Data Ingest Pipeline</h3>
+              <p className="text-xs text-text-muted">
+                Simulate parsing by uploading a Shambapro PDF export. The engine extracts crop metrics, writes nodes directly to Neo4j, and recalculates the scores live.
+              </p>
+            </div>
+            <label className="relative flex-shrink-0 flex items-center justify-center border-2 border-dashed border-border-default hover:border-accent-primary/40 hover:bg-bg-page rounded-xl px-5 py-3 cursor-pointer group transition-all">
+              <input
+                type="file"
+                accept=".pdf,.txt"
+                className="hidden"
+                onChange={handleFileUpload}
+                disabled={ingesting}
+              />
+              <span className="text-xs font-semibold text-text-secondary group-hover:text-accent-primary flex items-center gap-2">
+                {ingesting ? (
+                  <>
+                    <span className="inline-block w-3.5 h-3.5 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
+                    Ingesting & Writing to Neo4j…
+                  </>
+                ) : (
+                  <>
+                    <span>📤</span>
+                    Upload Farm Report (PDF/TXT)
+                  </>
+                )}
+              </span>
+            </label>
+          </div>
+
+          {/* Success/Error Alerts */}
+          {ingestSuccess && (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl p-3.5 text-xs max-w-3xl flex items-center gap-2 animate-fadeIn">
+              <span>✅</span>
+              <span>{ingestSuccess}</span>
+            </div>
+          )}
+          {ingestError && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl p-3.5 text-xs max-w-3xl flex items-center gap-2 animate-fadeIn">
+              <span>⚠️</span>
+              <span>{ingestError}</span>
+            </div>
+          )}
 
           {/* Stat strip */}
           {!loading && (
             <div className="flex flex-wrap gap-3 pt-2">
               {[
-                { label: 'Total farmers', value: String(farmers.length || 50) },
+                { label: 'Total farmers', value: String(farmers.length) },
                 { label: '⭐ Trusted',      value: String(tierCounts['trusted'] ?? 0) },
                 { label: '✓ Established',  value: String(tierCounts['established'] ?? 0) },
                 { label: '📈 Growing',      value: String(tierCounts['growing'] ?? 0) },

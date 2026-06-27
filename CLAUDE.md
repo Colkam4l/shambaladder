@@ -157,6 +157,8 @@ A quick plain-language summary of what "done" looks like per sprint so you can t
 | **Sprint 5** | Open the share link as a lender and see the full scorecard with peer benchmark data and verification badges. |
 | **Sprint 6** | The full demo runs end-to-end — pick a farmer, see the score, share it, view it as a lender — with zero placeholder text. |
 | **Sprint 7** | The demo runs on a phone-sized browser window with no broken layouts, loading states on every async call, and a complete README. |
+| **Sprint 8** | Lenders browse all 50 pre-scored farmers, filter by crop/score/tier, and request contact. |
+| **Sprint 9** | Upload a farm PDF (e.g., Shambapro), parse it via simulation, score it, save the new node directly to Neo4j Aura, and see the marketplace update dynamically. |
 
 ### How to Test the Completed Sprint
 

@@ -1,7 +1,7 @@
-// components/lender/FarmerMarketplaceCard.tsx
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CreditTier } from '@/types';
 import { TierBadge } from '@/components/ui/TierBadge';
 
@@ -43,6 +43,9 @@ interface FarmerMarketplaceCardProps {
 }
 
 export function FarmerMarketplaceCard({ farmer, onRequestContact }: FarmerMarketplaceCardProps) {
+  const router = useRouter();
+  const [loadingProfile, setLoadingProfile] = useState(false);
+
   const initials = farmer.name.split(' ').map(n => n[0]).slice(0, 2).join('');
   const cropEmoji = CROP_EMOJI[farmer.primaryCrop] ?? '🌱';
 
@@ -57,6 +60,20 @@ export function FarmerMarketplaceCard({ farmer, onRequestContact }: FarmerMarket
     farmer.tier === 'established' ? 'bg-tier-established' :
     farmer.tier === 'growing'     ? 'bg-tier-growing' :
                                     'bg-tier-seedling';
+
+  const handleViewProfile = async () => {
+    setLoadingProfile(true);
+    try {
+      const res = await fetch(`/api/share/marketplace-direct/${farmer.farmerId}`);
+      if (!res.ok) throw new Error('Could not create shared token.');
+      const data = await res.json();
+      router.push(`/lender/scorecard/${data.shareId}`);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load profile details. Please try again.');
+      setLoadingProfile(false);
+    }
+  };
 
   return (
     <div className="group bg-bg-card border border-border-default rounded-2xl p-5 flex flex-col gap-4 hover:border-accent-primary/40 hover:shadow-lg transition-all duration-200">
@@ -125,6 +142,13 @@ export function FarmerMarketplaceCard({ farmer, onRequestContact }: FarmerMarket
 
       {/* Actions */}
       <div className="flex gap-2 pt-1">
+        <button
+          onClick={handleViewProfile}
+          disabled={loadingProfile}
+          className="flex-1 py-2.5 rounded-xl border border-border-default text-text-secondary text-sm font-semibold hover:bg-bg-page transition-colors disabled:opacity-50"
+        >
+          {loadingProfile ? 'Loading…' : 'View Profile'}
+        </button>
         <button
           onClick={() => onRequestContact(farmer)}
           className="flex-1 py-2.5 rounded-xl bg-accent-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"

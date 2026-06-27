@@ -1,9 +1,11 @@
 import neo4j, { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
-let driver: Driver | null = null;
+const globalForNeo4j = global as unknown as {
+  neo4jDriver?: Driver;
+};
 
 function getDriver() {
-  if (driver) return driver;
+  if (globalForNeo4j.neo4jDriver) return globalForNeo4j.neo4jDriver;
 
   const uri = process.env.NEO4J_URI;
   const username = process.env.NEO4J_USERNAME;
@@ -15,8 +17,15 @@ function getDriver() {
     );
   }
 
-  driver = neo4j.driver(uri, neo4j.auth.basic(username, password));
-  return driver;
+  // Aura Free has a strict limit on active connections.
+  // Configure driver with connection pool properties to prevent socket exhaustion.
+  const newDriver = neo4j.driver(uri, neo4j.auth.basic(username, password), {
+    maxConnectionPoolSize: 5,
+    connectionTimeout: 10000, // 10s timeout instead of 60s
+  });
+
+  globalForNeo4j.neo4jDriver = newDriver;
+  return newDriver;
 }
 
 export async function runQuery<T>(
@@ -34,8 +43,8 @@ export async function runQuery<T>(
 }
 
 export async function closeDriver(): Promise<void> {
-  if (driver) {
-    await driver.close();
-    driver = null;
+  if (globalForNeo4j.neo4jDriver) {
+    await globalForNeo4j.neo4jDriver.close();
+    delete globalForNeo4j.neo4jDriver;
   }
 }

@@ -4,7 +4,7 @@
 // No PII gating needed here since names are shown per Decision 3 (Option B).
 
 import { NextRequest, NextResponse } from 'next/server';
-import { FARMER_REGISTRY } from '@/lib/farmer-registry/registry-data';
+import { getFarmersFromGraph } from '@/lib/neo4j/farmers';
 import { calculateComposite } from '@/lib/scoring';
 import { DEFAULT_WEIGHTS } from '@/types';
 
@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
   const minAcres   = searchParams.get('minAcres')    ? Number(searchParams.get('minAcres'))   : 0;
   const maxAcres   = searchParams.get('maxAcres')    ? Number(searchParams.get('maxAcres'))   : 100;
 
-  const results = FARMER_REGISTRY
+  const registry = await getFarmersFromGraph();
+
+  const results = registry
     .filter(p => p.marketplaceConsent)
     .map(profile => {
       let score;
